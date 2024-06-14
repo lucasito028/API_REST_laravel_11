@@ -16,7 +16,7 @@ class TaskController extends Controller
     public function index()
     {
         //
-        return TaskResource::collection(Task::query()->paginate(10));
+        return TaskResource::collection(Task::query()->with('priority')->paginate(15));
     }
 
     /**
@@ -33,6 +33,11 @@ class TaskController extends Controller
     public function store(StoreTaskRequest $request)
     {
         //
+        $task = Task::create($request->validated());
+
+        $task->load('priority');
+
+        return TaskResource::make($task);
     }
 
     /**
@@ -41,6 +46,7 @@ class TaskController extends Controller
     public function show(Task $task)
     {
         //
+        $task->load('priority');
         return TaskResource::make($task);
     }
 
@@ -58,6 +64,9 @@ class TaskController extends Controller
     public function update(UpdateTaskRequest $request, Task $task)
     {
         //
+        $task->update($request->validated());
+
+        return TaskResource::make($task);
     }
 
     /**
@@ -66,5 +75,8 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         //
+        $task->delete();
+
+        return response()->noContent();
     }
 }
